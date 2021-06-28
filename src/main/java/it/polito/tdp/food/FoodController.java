@@ -49,7 +49,20 @@ public class FoodController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Creazione grafo...");
+    	txtResult.appendText("Creazione grafo...\n");
+    	String p = this.txtPorzioni.getText();
+    	try {
+    		int porzioni = Integer.parseInt(p);
+    		if(porzioni < 1) {
+    			this.txtResult.appendText("Inserire un intero maggiore di 0!");
+        		return;
+    		}
+    		
+    	}
+    	catch(NumberFormatException nfe) {
+    		this.txtResult.appendText("Inserire un intero!");
+    		return;
+    	}
     }
     
     @FXML
