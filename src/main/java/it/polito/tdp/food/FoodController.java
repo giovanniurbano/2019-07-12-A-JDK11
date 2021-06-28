@@ -7,6 +7,7 @@ package it.polito.tdp.food;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.food.model.Food;
 import it.polito.tdp.food.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,7 +42,7 @@ public class FoodController {
     private Button btnSimula; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxFood"
-    private ComboBox<?> boxFood; // Value injected by FXMLLoader
+    private ComboBox<Food> boxFood; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -57,7 +58,10 @@ public class FoodController {
     			this.txtResult.appendText("Inserire un intero maggiore di 0!");
         		return;
     		}
+    		String msg = this.model.creaGrafo(porzioni);
+    		this.txtResult.appendText(msg);
     		
+    		this.boxFood.getItems().addAll(this.model.getVertici());
     	}
     	catch(NumberFormatException nfe) {
     		this.txtResult.appendText("Inserire un intero!");
