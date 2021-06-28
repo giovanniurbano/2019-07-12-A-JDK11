@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 import it.polito.tdp.food.model.Adiacenza;
 import it.polito.tdp.food.model.Food;
 import it.polito.tdp.food.model.Model;
+import it.polito.tdp.food.model.Simulator;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -52,6 +53,7 @@ public class FoodController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
+    	boxFood.getItems().clear();
     	txtResult.appendText("Creazione grafo...\n");
     	String p = this.txtPorzioni.getText();
     	try {
@@ -85,7 +87,7 @@ public class FoodController {
     		this.txtResult.appendText("Scegliere un cibo!");
     		return;
     	}
-    	List<Adiacenza> topFive = this.model.getViciniCalorie(f);
+    	List<Adiacenza> topFive = this.model.getViciniCalorie(f, 5);
     	for(Adiacenza a : topFive) {
     		this.txtResult.appendText(a.getF2() + " - " + a.getPeso() + "\n");
     	}
@@ -94,7 +96,34 @@ public class FoodController {
     @FXML
     void doSimula(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Simulazione...");
+    	txtResult.appendText("Simulazione...\n");
+    	Food f = this.boxFood.getValue();
+    	
+    	if(this.model.getGrafo() == null) {
+    		this.txtResult.appendText("Creare prima il grafo!");
+    		return;
+    	}	
+    	if(f == null) {
+    		this.txtResult.appendText("Scegliere un cibo!");
+    		return;
+    	}
+    	
+    	String k = this.txtK.getText();
+    	try {
+    		int stazioni = Integer.parseInt(k);
+    		if(stazioni < 1 || stazioni > 10) {
+    			this.txtResult.appendText("Inserire un intero compreso tra 1 e 10!");
+        		return;
+    		}
+    		Simulator sim = new Simulator(this.model, stazioni, f);
+    		sim.run();
+    		this.txtResult.appendText("Cibi preparati: " + sim.getnCibi());
+    		this.txtResult.appendText("\nTempo impiegato: " + sim.getTempoImpiegato());
+    	}
+    	catch(NumberFormatException nfe) {
+    		this.txtResult.appendText("Inserire un intero!");
+    		return;
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete

@@ -49,7 +49,7 @@ public class Model {
 		return vertici;
 	}
 
-	public List<Adiacenza> getViciniCalorie(Food f) {
+	public List<Adiacenza> getViciniCalorie(Food f, int k) {
 		List<Food> vicini = Graphs.neighborListOf(this.grafo, f);
 		List<Adiacenza> topFive = new ArrayList<Adiacenza>();
 		for(Food vicino : vicini) {
@@ -59,7 +59,10 @@ public class Model {
 		
 		Collections.sort(topFive);
 		
-		return topFive.subList(0, 5);
+		if(topFive.size() < k)
+			return topFive;
+		else
+			return topFive.subList(0, k);
 	}
 	
 	
