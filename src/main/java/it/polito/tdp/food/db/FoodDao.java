@@ -117,7 +117,8 @@ public class FoodDao {
 				+ "FROM `portion` p, food f "
 				+ "WHERE p.food_code = f.food_code "
 				+ "GROUP BY f.food_code, f.display_name "
-				+ "HAVING COUNT(*) <= ?" ;
+				+ "HAVING COUNT(*) <= ? "
+				+ "ORDER BY f.display_name" ;
 		try {
 			Connection conn = DBConnect.getConnection() ;
 
@@ -148,23 +149,21 @@ public class FoodDao {
 	}
 	
 	public List<Adiacenza> getAdiacenze(int porzioni, Map<Integer, Food> idMap) {
-		String sql = "SELECT f1.food_code AS f1, f2.food_code AS f2, AVG(c1.condiment_calories) AS peso "
-				+ "FROM food f1, food f2, food_condiment fc1, food_condiment fc2, condiment c1, condiment c2 "
-				+ "WHERE f1.food_code = fc1.food_code AND f2.food_code = fc2.food_code "
-				+ "AND fc1.condiment_code = c1.condiment_code AND fc2.condiment_code = c2.condiment_code "
-				+ "AND c1.condiment_code = c2.condiment_code "
-				+ "AND f1.food_code < f2.food_code "
-				+ "AND f1.food_code IN (SELECT f.food_code "
+		String sql = "SELECT fc1.food_code AS f1, fc2.food_code AS f2, AVG(c.condiment_calories) AS peso "
+				+ "FROM food_condiment fc1, food_condiment fc2, condiment c "
+				+ "WHERE fc1.condiment_code = c.condiment_code AND fc2.condiment_code = c.condiment_code "
+				+ "AND fc1.food_code < fc2.food_code "
+				+ "AND fc1.food_code IN (SELECT f.food_code "
 				+ "							FROM `portion` p, food f  "
 				+ "							WHERE p.food_code = f.food_code  "
 				+ "							GROUP BY f.food_code "
 				+ "							HAVING COUNT(*) <= ?) "
-				+ "AND f2.food_code IN (SELECT f.food_code "
+				+ "AND fc2.food_code IN (SELECT f.food_code "
 				+ "							FROM `portion` p, food f  "
 				+ "							WHERE p.food_code = f.food_code  "
 				+ "							GROUP BY f.food_code "
 				+ "							HAVING COUNT(*) <= ?) "
-				+ "GROUP BY f1.food_code, f2.food_code "
+				+ "GROUP BY fc1.food_code, fc2.food_code "
 				+ "HAVING peso > 0" ;
 		try {
 			Connection conn = DBConnect.getConnection() ;
@@ -195,6 +194,43 @@ public class FoodDao {
 			return list ;
 
 		} catch (SQLException e) {
+			e.printStackTrace();
+			return null ;
+		}
+	}
+	
+	public Double calorieCongiunte(Food f1, Food f2) {
+		String sql = "SELECT fc1.food_code, fc2.food_code,  " + 
+				"		 AVG(condiment.condiment_calories) AS cal " + 
+				"FROM food_condiment AS fc1, food_condiment AS fc2, condiment " + 
+				"WHERE fc1.condiment_code=fc2.condiment_code " + 
+				"AND condiment.condiment_code=fc1.condiment_code " + 
+				"AND fc1.id<>fc2.id " + 
+				"AND fc1.food_code=? " + 
+				"AND fc2.food_code=? " + 
+				"GROUP BY fc1.food_code, fc2.food_code" ;
+		
+		try {
+			Connection conn = DBConnect.getConnection() ;
+
+			PreparedStatement st = conn.prepareStatement(sql) ;
+			
+			st.setInt(1, f1.getFood_code());
+			st.setInt(2, f2.getFood_code());
+			
+			ResultSet res = st.executeQuery() ;
+			
+			Double calories = null ;
+			if(res.first()) {
+				calories = res.getDouble("cal") ;
+			}
+			// altimenti rimane null
+			
+			conn.close();
+			return calories ;
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null ;
 		}

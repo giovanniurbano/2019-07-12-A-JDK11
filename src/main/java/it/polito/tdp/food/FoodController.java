@@ -5,8 +5,10 @@
 package it.polito.tdp.food;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.food.model.Adiacenza;
 import it.polito.tdp.food.model.Food;
 import it.polito.tdp.food.model.Model;
 import javafx.event.ActionEvent;
@@ -72,7 +74,21 @@ public class FoodController {
     @FXML
     void doCalorie(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Analisi calorie...");
+    	txtResult.appendText("Analisi calorie...\n");
+    	Food f = this.boxFood.getValue();
+    	
+    	if(this.model.getGrafo() == null) {
+    		this.txtResult.appendText("Creare prima il grafo!");
+    		return;
+    	}	
+    	if(f == null) {
+    		this.txtResult.appendText("Scegliere un cibo!");
+    		return;
+    	}
+    	List<Adiacenza> topFive = this.model.getViciniCalorie(f);
+    	for(Adiacenza a : topFive) {
+    		this.txtResult.appendText(a.getF2() + " - " + a.getPeso() + "\n");
+    	}
     }
 
     @FXML
