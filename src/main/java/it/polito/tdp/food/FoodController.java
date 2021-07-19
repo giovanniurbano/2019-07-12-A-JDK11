@@ -52,78 +52,17 @@ public class FoodController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-    	txtResult.clear();
-    	boxFood.getItems().clear();
-    	txtResult.appendText("Creazione grafo...\n");
-    	String p = this.txtPorzioni.getText();
-    	try {
-    		int porzioni = Integer.parseInt(p);
-    		if(porzioni < 1) {
-    			this.txtResult.appendText("Inserire un intero maggiore di 0!");
-        		return;
-    		}
-    		String msg = this.model.creaGrafo(porzioni);
-    		this.txtResult.appendText(msg);
-    		
-    		this.boxFood.getItems().addAll(this.model.getVertici());
-    	}
-    	catch(NumberFormatException nfe) {
-    		this.txtResult.appendText("Inserire un intero!");
-    		return;
-    	}
+    	
     }
     
     @FXML
     void doCalorie(ActionEvent event) {
-    	txtResult.clear();
-    	txtResult.appendText("Analisi calorie...\n");
-    	Food f = this.boxFood.getValue();
     	
-    	if(this.model.getGrafo() == null) {
-    		this.txtResult.appendText("Creare prima il grafo!");
-    		return;
-    	}	
-    	if(f == null) {
-    		this.txtResult.appendText("Scegliere un cibo!");
-    		return;
-    	}
-    	List<Adiacenza> topFive = this.model.getViciniCalorie(f, 5);
-    	for(Adiacenza a : topFive) {
-    		this.txtResult.appendText(a.getF2() + " - " + a.getPeso() + "\n");
-    	}
     }
 
     @FXML
     void doSimula(ActionEvent event) {
-    	txtResult.clear();
-    	txtResult.appendText("Simulazione...\n");
-    	Food f = this.boxFood.getValue();
     	
-    	if(this.model.getGrafo() == null) {
-    		this.txtResult.appendText("Creare prima il grafo!");
-    		return;
-    	}	
-    	if(f == null) {
-    		this.txtResult.appendText("Scegliere un cibo!");
-    		return;
-    	}
-    	
-    	String k = this.txtK.getText();
-    	try {
-    		int stazioni = Integer.parseInt(k);
-    		if(stazioni < 1 || stazioni > 10) {
-    			this.txtResult.appendText("Inserire un intero compreso tra 1 e 10!");
-        		return;
-    		}
-    		Simulator sim = new Simulator(this.model, stazioni, f);
-    		sim.run();
-    		this.txtResult.appendText("Cibi preparati: " + sim.getnCibi());
-    		this.txtResult.appendText("\nTempo impiegato: " + sim.getTempoImpiegato());
-    	}
-    	catch(NumberFormatException nfe) {
-    		this.txtResult.appendText("Inserire un intero!");
-    		return;
-    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
