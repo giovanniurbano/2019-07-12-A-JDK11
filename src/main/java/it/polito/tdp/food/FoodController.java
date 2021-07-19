@@ -11,7 +11,6 @@ import java.util.ResourceBundle;
 import it.polito.tdp.food.model.Adiacenza;
 import it.polito.tdp.food.model.Food;
 import it.polito.tdp.food.model.Model;
-import it.polito.tdp.food.model.Simulator;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -83,7 +82,7 @@ public class FoodController {
     		this.txtResult.setText("Scegliere un cibo!");
     		return;
     	}
-    	List<Adiacenza> bestFive = this.model.getBestFive(f);
+    	List<Adiacenza> bestFive = this.model.getBestN(f, 5);
     	this.txtResult.setText("Cibi con calorie congiunte massime:");
     	for(Adiacenza a : bestFive)
     		this.txtResult.appendText("\n" + a.getF2() + " - " + a.getPeso());	
@@ -91,7 +90,36 @@ public class FoodController {
 
     @FXML
     void doSimula(ActionEvent event) {
-    	
+    	if(this.model.getGrafo() == null) {
+    		this.txtResult.setText("Creare grafo!");
+    		return;
+    	}
+    	Food f = this.boxFood.getValue();
+    	if(f == null) {
+    		this.txtResult.setText("Scegliere un cibo!");
+    		return;
+    	}
+    	String ks = this.txtK.getText();
+    	try {
+    		int k = Integer.parseInt(ks);
+    		if(k < 1 || k > 10) {
+    			this.txtResult.setText("Inserire un intero compreso tra 1 e 10!");
+        		return;
+    		}
+    		try {
+	    		this.model.simula(f, k);
+	    		this.txtResult.setText("Numero di cibi preparati: " + this.model.getNCibi());
+	    		this.txtResult.appendText("\n\nTempo totale richiesto: " + this.model.getTtot());
+    		}
+    		catch(IllegalArgumentException iae) {
+    			this.txtResult.setText("Il cibo scelto non ha collegamenti!");
+        		return;
+    		}
+    	}
+    	catch(NumberFormatException nfe) {
+    		this.txtResult.setText("Inserire un intero!");
+    		return;
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete

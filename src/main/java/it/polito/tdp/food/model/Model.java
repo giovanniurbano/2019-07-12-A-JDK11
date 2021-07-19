@@ -20,6 +20,8 @@ public class Model {
 	private List<Food> vertici;
 	private Map<Integer, Food> idMap;
 	
+	private Simulator sim;
+	
 	public Model() {
 		this.dao = new FoodDao();
 	}
@@ -50,7 +52,7 @@ public class Model {
 		return vertici;
 	}
 
-	public List<Adiacenza> getBestFive(Food f) {
+	public List<Adiacenza> getBestN(Food f, int n) {
 		List<Adiacenza> res = new LinkedList<Adiacenza>();
 		Set<DefaultWeightedEdge> vicini = this.grafo.edgesOf(f);
 		for(DefaultWeightedEdge vicino : vicini) {
@@ -64,10 +66,22 @@ public class Model {
 				res.add(new Adiacenza(target, source, peso));
 		}
 		Collections.sort(res);
-		if(res.size() > 4)
-			return res.subList(0, 5);
+		if(res.size() > n-1)
+			return res.subList(0, n);
 		else
 			return res;
+	}
+	
+	public void simula(Food f, int k) {
+		this.sim = new Simulator(f, k, this);
+	}
+
+	public int getNCibi() {
+		return this.sim.getNPreparati();
+	}
+
+	public Double getTtot() {
+		return this.sim.getTempoTotale();
 	}
 	
 }
