@@ -52,12 +52,41 @@ public class FoodController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-    	
+    	this.boxFood.getItems().clear();
+    	this.txtResult.clear();
+    	String ps = this.txtPorzioni.getText();
+    	try {
+    		int p = Integer.parseInt(ps);
+    		if(p < 0) {
+    			this.txtResult.setText("Inserire un intero > 0!");
+        		return;
+    		}
+    		String msg = this.model.creaGrafo(p);
+    		this.txtResult.appendText(msg);
+    		
+    		this.boxFood.getItems().addAll(this.model.getVertici());
+    	}
+    	catch(NumberFormatException nfe) {
+    		this.txtResult.setText("Inserire un intero!");
+    		return;
+    	}
     }
     
     @FXML
     void doCalorie(ActionEvent event) {
-    	
+    	if(this.model.getGrafo() == null) {
+    		this.txtResult.setText("Creare grafo!");
+    		return;
+    	}
+    	Food f = this.boxFood.getValue();
+    	if(f == null) {
+    		this.txtResult.setText("Scegliere un cibo!");
+    		return;
+    	}
+    	List<Adiacenza> bestFive = this.model.getBestFive(f);
+    	this.txtResult.setText("Cibi con calorie congiunte massime:");
+    	for(Adiacenza a : bestFive)
+    		this.txtResult.appendText("\n" + a.getF2() + " - " + a.getPeso());	
     }
 
     @FXML

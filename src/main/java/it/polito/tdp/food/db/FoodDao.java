@@ -112,6 +112,78 @@ public class FoodDao {
 
 	}
 
+	public List<Food> getVertici(int porzioni) {
+		String sql = "SELECT f.food_code AS c, f.display_name AS n "
+				+ "FROM food f, `portion` p "
+				+ "WHERE f.food_code = p.food_code "
+				+ "GROUP BY f.food_code, f.display_name "
+				+ "HAVING COUNT(DISTINCT p.portion_id) = ?";
+		try {
+			Connection conn = DBConnect.getConnection() ;
+
+			PreparedStatement st = conn.prepareStatement(sql) ;
+			st.setInt(1, porzioni);
+			
+			List<Food> list = new ArrayList<>() ;
+			
+			ResultSet res = st.executeQuery() ;
+			
+			while(res.next()) {
+				try {
+					list.add(new Food(res.getInt("c"), res.getString("n")));
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
+			}
+			
+			conn.close();
+			return list ;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null ;
+		}
+
+	}
+
+	public List<Adiacenza> getAdiacenze(Map<Integer, Food> idMap) {
+		String sql = "SELECT f1.food_code AS f1, f2.food_code AS f2, AVG(DISTINCT c.condiment_calories) AS peso "
+				+ "FROM food_condiment f1, food_condiment f2, condiment c "
+				+ "WHERE f1.food_code < f2.food_code "
+				+ "AND f1.condiment_code = f2.condiment_code AND f1.condiment_code = c.condiment_code "
+				+ "GROUP BY f1, f2 "
+				+ "HAVING peso > 0";
+		try {
+			Connection conn = DBConnect.getConnection() ;
+
+			PreparedStatement st = conn.prepareStatement(sql) ;
+			
+			List<Adiacenza> list = new ArrayList<>() ;
+			
+			ResultSet res = st.executeQuery() ;
+			
+			while(res.next()) {
+				try {
+					Food f1 = idMap.get(res.getInt("f1"));
+					Food f2 = idMap.get(res.getInt("f2"));
+					if(f1 != null && f2 != null && !f1.equals(f2)) {
+						list.add(new Adiacenza(f1, f2, res.getDouble("peso")));
+					}
+				} 
+				catch (Throwable t) {
+					t.printStackTrace();
+				}
+			}
+			
+			conn.close();
+			return list ;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null ;
+		}
+	}
+
 	
 	
 }
